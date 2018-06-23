@@ -1,9 +1,7 @@
 require('src/dependencies')
 
-local player = Player {
-    x = 100,
-    y = 100,
-}
+local level = nil
+local player = nil
 
 function love.load()
     math.randomseed(os.time())
@@ -20,13 +18,18 @@ function love.load()
 
     GREEN_TILES = Utils.generateQuadsFromTo(TILESHEET, 8, 8, {x = 0, y = 2}, 6)
 
-    GRID = {}
-    for i = 1, MAPSIZE do
-        GRID[i] = {}
-        for j = 1, MAPSIZE do
-            GRID[i][j] = math.random() > 0.9 and 16 or 13
-        end
-    end
+    level = Level {
+        map = LevelGenerator.generate({w = 17, h = 17,}, function() return 1 end),
+        tileset = GREEN_TILES,
+        tilesize = DRAW_TILESIZE,
+        scale = SCALE,
+    }
+
+    player = Player {
+        x = 0,
+        y = 0,
+        scale = SCALE,
+    }
 end
 
 function love.keypressed(key)
@@ -40,9 +43,6 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.draw(TILESHEET, GREEN_TILES[1], 100, 100, 0, SCALE)
-    love.graphics.draw(TILESHEET, GREEN_TILES[1], 100 + DRAW_TILESIZE, 100, 0, SCALE)
-    love.graphics.draw(TILESHEET, GREEN_TILES[1], 100, 100 + DRAW_TILESIZE, 0, SCALE)
-    love.graphics.draw(TILESHEET, GREEN_TILES[1], 100 + DRAW_TILESIZE, 100 + DRAW_TILESIZE, 0, SCALE)
+    level:draw()
     player:draw()
 end
